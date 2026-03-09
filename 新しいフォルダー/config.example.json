@@ -1,0 +1,41 @@
+{
+  "site": {
+    "base_url": "https://YOUR-DOMAIN/",
+    "poll_minutes": 15
+  },
+  "affiliate": {
+    "amazon_tag": "YOUR_AMAZON_ASSOCIATE_ID",
+    "rakuten_url": "https://hb.afl.rakuten.co.jp/",
+    "yahoo_url": "https://shopping.yahoo.co.jp/"
+  },
+  "monitors": {
+    "pokemoncenter": {
+      "enabled": true,
+      "url": "https://www.pokemoncenter-online.com/"
+    },
+    "yodobashi": {
+      "enabled": true,
+      "url": "https://limited.yodobashi.com/"
+    },
+    "joshin": {
+      "enabled": true,
+      "url": "https://joshinweb.jp/"
+    },
+    "amazon_invite": {
+      "enabled": true,
+      "url": "https://www.amazon.co.jp/s?k=%E3%83%9D%E3%82%B1%E3%83%A2%E3%83%B3%E3%82%AB%E3%83%BC%E3%83%89"
+    },
+    "rakuten": {
+      "enabled": true,
+      "url": "https://search.rakuten.co.jp/search/mall/%E3%83%9D%E3%82%B1%E3%83%A2%E3%83%B3%E3%82%AB%E3%83%BC%E3%83%89/"
+    },
+    "yahoo": {
+      "enabled": true,
+      "url": "https://shopping.yahoo.co.jp/search?p=%E3%83%9D%E3%82%B1%E3%83%A2%E3%83%B3%E3%82%AB%E3%83%BC%E3%83%89"
+    }
+  },
+  "notifications": {
+    "discord_webhook": "",
+    "enable_discord": false
+  }
+}
