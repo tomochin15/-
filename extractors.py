@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>プライバシーポリシー | ポケカ速報ラボ</title>
-<meta name="description" content="プライバシーポリシー。" />
+<title>お問い合わせ | ポケカ速報ラボ</title>
+<meta name="description" content="お問い合わせページ。" />
 <link rel="stylesheet" href="style.css" />
 <link rel="manifest" href="site.webmanifest" />
 
@@ -15,8 +15,8 @@
 <main class="container page">
   <section class="card">
     <p><a href="index.html">← トップへ戻る</a></p>
-    <h1>プライバシーポリシー</h1>
-    <p>広告配信、アクセス解析、アフィリエイトリンクの利用に関するポリシーを記載するためのテンプレートです。</p>
+    <h1>お問い合わせ</h1>
+    <p>このページはテンプレートです。実運用時はGoogleフォームやFormspreeなどに接続してください。</p>
   </section>
 </main>
 

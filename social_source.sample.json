@@ -1,9 +1,26 @@
-[
-  {
-    "source": "ポケゲトちゃんねる",
-    "title": "ポケカ抽選・販売情報",
-    "url": "https://x.com/",
-    "publishedAt": "2026-03-09 11:45",
-    "summary": "ポケポケ関連を除外してポケモンカード情報のみ収集する想定。"
-  }
-]
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ショップ一覧 | ポケカ速報ラボ</title>
+<meta name="description" content="監視対象ショップの見どころを整理するページ。" />
+<link rel="stylesheet" href="style.css" />
+<link rel="manifest" href="site.webmanifest" />
+
+</head>
+<body>
+
+<nav class="topnav container"><a href="index.html">トップ</a><a href="lotteries.html">抽選一覧</a><a href="guides/index.html">ガイド</a></nav>
+<main class="container page">
+  <section class="card">
+    <p><a href="index.html">← トップへ戻る</a></p>
+    <h1>ショップ一覧</h1>
+    <p>どのショップを優先して見るべきか、役割ごとに整理しています。</p>
+    <div id="shopFeed" class="feed-list"></div>
+  </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>

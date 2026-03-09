@@ -1,67 +1,58 @@
-# ポケカ速報ラボ 自動更新・具体化版
+from __future__ import annotations
 
-この版では、以下3サイトの更新ロジックを雛形より一歩進めて実装しています。
+from datetime import datetime
+from typing import Any, Dict, List
 
-- ポケモンセンターオンライン
-- ヨドバシ.com
-- Joshin
+def now_jst_text() -> str:
+    return datetime.now().strftime("%Y-%m-%d %H:%M")
 
-## 追加ファイル
-- `scraper_pokemoncenter.py`
-- `scraper_yodobashi.py`
-- `scraper_joshin.py`
-- `requirements.txt`
+def make_lottery(
+    shop: str,
+    product: str,
+    status: str,
+    url: str,
+    start: str = "未定",
+    end: str = "未定",
+    result: str = "未定",
+    summary: str = "",
+) -> Dict[str, Any]:
+    return {
+        "shop": shop,
+        "product": product,
+        "status": status,
+        "start": start,
+        "end": end,
+        "result": result,
+        "url": url,
+        "publishedAt": now_jst_text(),
+        "summary": summary,
+    }
 
-## 使い方
-1. `pip install -r requirements.txt`
-2. `python build_data.py`
-3. `data.json` が更新される
-4. サイトを再読み込み
+def make_commerce(
+    shop: str,
+    title: str,
+    kind: str,
+    status: str,
+    url: str,
+    summary: str = "",
+) -> Dict[str, Any]:
+    return {
+        "shop": shop,
+        "title": title,
+        "kind": kind,
+        "status": status,
+        "url": url,
+        "publishedAt": now_jst_text(),
+        "summary": summary,
+    }
 
-## 注意
-- 公式サイトのHTML構造は変わるため、将来的に微修正が必要です。
-- ポケモンセンターオンラインの商品別スケジュールは、個別商品ページに深掘りすればさらに精度を上げられます。
-- Amazon / 楽天 / Yahooは引き続き導線中心です。
-
-## 次に強くする順番
-1. ポケモンセンターオンラインの個別商品ページ解析
-2. ヨドバシの対象商品抽出
-3. Discord通知の差分判定
-4. X情報のフィルタ連携
-
-
-## 今回の強化
-- ポケモンセンターオンラインの抽選応募一覧から個別商品ページ候補を追跡
-- 個別商品ページ本文から、開始・終了・結果発表らしき日時文言を簡易抽出
-- 個別ページ取得に失敗した場合も、リンク自体は `data.json` に残す設計
-
-## 現実的な限界
-- 公式サイトの文言変更やHTML変更があると抽出ルールの微修正は必要
-- 日本語日時はページ記述揺れがあるため、最終確認は公式ページ前提
-
-
-## 今回の追加強化
-- ヨドバシ抽選トップから個別候補リンクを追跡
-- 個別候補ページ本文から、開始・終了・結果発表らしき日時文言を簡易抽出
-- 個別候補ページの取得失敗時も、リンク自体は `data.json` に残す設計
-
-## 次に最も効く改善
-- Joshinの個別抽選導線の深掘り
-- 差分検知による Discord 通知
-- X情報との統合
-
-
-## X情報との統合
-- `scraper_x.py` を追加
-- `social_source.sample.json` を追加
-- `build_data.py` が `social` セクションも更新するよう変更
-
-### 使い方
-1. `social_source.sample.json` を `social_source.json` にコピー
-2. Xから拾いたい投稿をJSONで入れる
-3. `python build_data.py` を実行
-4. トップページの X情報 セクションに反映
-
-### フィルタ
-- 除外: `ポケポケ`
-- 収集対象の主キーワード: `ポケモンカード`, `ポケカ`, `抽選`, `再販`, `予約`
+def dedupe_by_keys(items: List[Dict[str, Any]], keys: List[str]) -> List[Dict[str, Any]]:
+    seen = set()
+    out = []
+    for item in items:
+        signature = tuple(item.get(k, "") for k in keys)
+        if signature in seen:
+            continue
+        seen.add(signature)
+        out.append(item)
+    return out

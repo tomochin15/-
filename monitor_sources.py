@@ -1,102 +1,36 @@
-from __future__ import annotations
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FAQ | ポケカ速報ラボ</title>
+<meta name="description" content="よくある質問をまとめたページ。" />
+<link rel="stylesheet" href="style.css" />
+<link rel="manifest" href="site.webmanifest" />
 
-import json
-from pathlib import Path
-from typing import Any, Dict, List
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"FAQPage",
+  "mainEntity":[
+    {"@type":"Question","name":"このサイトは公式ですか？","acceptedAnswer":{"@type":"Answer","text":"公式運営ではありません。最終確認は各公式ページで行ってください。"}},
+    {"@type":"Question","name":"Amazonの通常在庫も載りますか？","acceptedAnswer":{"@type":"Answer","text":"この構成ではAmazon招待リクエストのみを主対象にしています。"}}
+  ]
+}
+</script>
 
-from monitor_utils import make_lottery, make_commerce
+</head>
+<body>
 
-ROOT = Path(__file__).parent
+<nav class="topnav container"><a href="index.html">トップ</a><a href="guides/index.html">ガイド</a></nav>
+<main class="container page">
+  <section class="card">
+    <p><a href="index.html">← トップへ戻る</a></p>
+    <h1>FAQ</h1>
+    <div id="faqFeed"></div>
+  </section>
+</main>
 
-def load_config() -> Dict[str, Any]:
-    path = ROOT / "config.json"
-    if not path.exists():
-        path = ROOT / "config.example.json"
-    return json.loads(path.read_text(encoding="utf-8"))
-
-def monitor_pokemoncenter(cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
-    if not cfg["monitors"]["pokemoncenter"]["enabled"]:
-        return []
-    return [
-        make_lottery(
-            shop="ポケモンセンターオンライン",
-            product="ポケモンカード新弾BOX",
-            status="応募受付中",
-            url=cfg["monitors"]["pokemoncenter"]["url"],
-            start="2026-03-09 12:00",
-            end="2026-03-11 16:59",
-            result="2026-03-14 12:00",
-            summary="公式抽選ページを監視するテンプレート。",
-        )
-    ]
-
-def monitor_yodobashi(cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
-    if not cfg["monitors"]["yodobashi"]["enabled"]:
-        return []
-    return [
-        make_lottery(
-            shop="ヨドバシ.com",
-            product="ポケモンカードBOX",
-            status="応募予告",
-            url=cfg["monitors"]["yodobashi"]["url"],
-            start="2026-03-10 10:00",
-            end="2026-03-12 23:59",
-            result="2026-03-15 10:00",
-            summary="抽選販売ページ監視のテンプレート。",
-        )
-    ]
-
-def monitor_joshin(cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
-    if not cfg["monitors"]["joshin"]["enabled"]:
-        return []
-    return [
-        make_lottery(
-            shop="Joshin",
-            product="ポケモンカードBOX",
-            status="告知待ち",
-            url=cfg["monitors"]["joshin"]["url"],
-            summary="玩具ページの告知監視テンプレート。",
-        )
-    ]
-
-def monitor_amazon_invite(cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
-    if not cfg["monitors"]["amazon_invite"]["enabled"]:
-        return []
-    return [
-        make_commerce(
-            shop="Amazon",
-            title="ポケモンカード 招待リクエスト",
-            kind="Amazon招待",
-            status="受付中",
-            url=cfg["monitors"]["amazon_invite"]["url"],
-            summary="Amazon招待リクエストのみ掲載するテンプレート。",
-        )
-    ]
-
-def monitor_rakuten(cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
-    if not cfg["monitors"]["rakuten"]["enabled"]:
-        return []
-    return [
-        make_commerce(
-            shop="楽天ブックス",
-            title="ポケモンカード 予約検索",
-            kind="楽天予約",
-            status="監視中",
-            url=cfg["monitors"]["rakuten"]["url"],
-            summary="楽天導線監視テンプレート。",
-        )
-    ]
-
-def monitor_yahoo(cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
-    if not cfg["monitors"]["yahoo"]["enabled"]:
-        return []
-    return [
-        make_commerce(
-            shop="Yahooショッピング",
-            title="ポケモンカード 再販・予約検索",
-            kind="Yahoo検索",
-            status="監視中",
-            url=cfg["monitors"]["yahoo"]["url"],
-            summary="Yahoo導線監視テンプレート。",
-        )
-    ]
+<script src="app.js"></script>
+</body>
+</html>

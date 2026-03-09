@@ -1,30 +1,31 @@
-from __future__ import annotations
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>抽選一覧 | ポケカ速報ラボ</title>
+<meta name="description" content="ポケモンカードの抽選情報を一覧で確認できるページ。" />
+<link rel="stylesheet" href="style.css" />
+<link rel="manifest" href="site.webmanifest" />
 
-import json
-from pathlib import Path
-from urllib.request import Request, urlopen
+</head>
+<body>
 
-ROOT = Path(__file__).parent
+<nav class="topnav container"><a href="index.html">トップ</a><a href="calendar.html">抽選カレンダー</a><a href="guides/index.html">ガイド</a></nav>
+<main class="container page">
+  <section class="card">
+    <p><a href="index.html">← トップへ戻る</a></p>
+    <h1>抽選一覧</h1>
+    <p class="notice">受付中、予告、告知待ちを一画面で見比べられるようにしています。</p>
+    <table id="lotteryTable">
+      <thead>
+        <tr><th>ショップ</th><th>商品</th><th>状態</th><th>受付期間</th><th>結果</th><th>締切まで</th><th>リンク</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+</main>
 
-def load_config():
-    path = ROOT / "config.json"
-    if not path.exists():
-        path = ROOT / "config.example.json"
-    return json.loads(path.read_text(encoding="utf-8"))
-
-def send_discord(message: str) -> None:
-    cfg = load_config()
-    if not cfg["notifications"]["enable_discord"]:
-        print("discord disabled")
-        return
-    webhook = cfg["notifications"]["discord_webhook"]
-    if not webhook:
-        print("discord webhook missing")
-        return
-    body = json.dumps({"content": message}).encode("utf-8")
-    req = Request(webhook, data=body, headers={"Content-Type": "application/json"})
-    with urlopen(req) as res:
-        print(res.status)
-
-if __name__ == "__main__":
-    send_discord("ポケカ速報ラボ: 更新を検知しました。")
+<script src="app.js"></script>
+</body>
+</html>

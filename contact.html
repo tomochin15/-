@@ -1,25 +1,141 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>お問い合わせ | ポケカ速報ラボ</title>
-<meta name="description" content="お問い合わせページ。" />
-<link rel="stylesheet" href="style.css" />
-<link rel="manifest" href="site.webmanifest" />
 
-</head>
-<body>
+from __future__ import annotations
 
-<nav class="topnav container"><a href="index.html">トップ</a><a href="about.html">運営情報</a></nav>
-<main class="container page">
-  <section class="card">
-    <p><a href="index.html">← トップへ戻る</a></p>
-    <h1>お問い合わせ</h1>
-    <p>このページはテンプレートです。実運用時はGoogleフォームやFormspreeなどに接続してください。</p>
-  </section>
-</main>
+import json
+from pathlib import Path
+from datetime import datetime
+from typing import Any, Dict, List
 
-<script src="app.js"></script>
-</body>
-</html>
+from scraper_pokemoncenter import scrape as scrape_pc
+from scraper_yodobashi import scrape as scrape_yd
+from scraper_joshin import scrape as scrape_js
+from scraper_x import scrape as scrape_x
+
+ROOT = Path(__file__).parent
+DATA_PATH = ROOT / "data.json"
+STATE_PATH = ROOT / ".last_state.json"
+CONFIG_PATH = ROOT / "config.json"
+CONFIG_EXAMPLE_PATH = ROOT / "config.example.json"
+
+def now_text() -> str:
+    return datetime.now().strftime("%Y-%m-%d %H:%M")
+
+def load_base() -> Dict[str, Any]:
+    if DATA_PATH.exists():
+        return json.loads(DATA_PATH.read_text(encoding="utf-8"))
+    return {
+        "site": {
+            "name": "ポケカ速報ラボ",
+            "tagline": "抽選・再販・予約を、速く、正確に、見やすく。",
+            "updatedAt": now_text(),
+            "heroNote": "自動更新テンプレート。"
+        },
+        "lottery": [],
+        "commerce": [],
+        "social": [],
+        "shops": [],
+        "faq": [],
+        "guides": []
+    }
+
+def load_config() -> Dict[str, Any]:
+    path = CONFIG_PATH if CONFIG_PATH.exists() else CONFIG_EXAMPLE_PATH
+    if not path.exists():
+        return {"notifications": {"enable_discord": False, "discord_webhook": ""}}
+    return json.loads(path.read_text(encoding="utf-8"))
+
+def stable_signature(item: Dict[str, Any]) -> str:
+    keys = ["shop", "product", "status", "start", "end", "result", "url"]
+    return "||".join(str(item.get(k, "")) for k in keys)
+
+def diff_items(old_items: List[Dict[str, Any]], new_items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    old = {stable_signature(x): x for x in old_items}
+    changed = []
+    for item in new_items:
+        sig = stable_signature(item)
+        if sig not in old:
+            changed.append(item)
+    return changed
+
+def save_state(payload: Dict[str, Any]) -> None:
+    STATE_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+def load_state() -> Dict[str, Any]:
+    if not STATE_PATH.exists():
+        return {"lottery": [], "commerce": [], "social": []}
+    return json.loads(STATE_PATH.read_text(encoding="utf-8"))
+
+def try_send_discord(message: str) -> None:
+    cfg = load_config()
+    notif = cfg.get("notifications", {})
+    if not notif.get("enable_discord"):
+        return
+    webhook = notif.get("discord_webhook", "")
+    if not webhook:
+        return
+    try:
+        import requests
+        requests.post(webhook, json={"content": message}, timeout=20)
+    except Exception:
+        pass
+
+def normalize(items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    out = []
+    seen = set()
+    for item in items:
+        sig = stable_signature(item)
+        if sig in seen:
+            continue
+        seen.add(sig)
+        out.append(item)
+    out.sort(key=lambda x: x.get("publishedAt", ""), reverse=True)
+    return out
+
+def main() -> None:
+    payload = load_base()
+    lottery: List[Dict[str, Any]] = []
+    errors: List[str] = []
+
+    for func in (scrape_pc, scrape_yd, scrape_js):
+        try:
+            rows = func()
+            for row in rows:
+                row["publishedAt"] = now_text()
+            lottery.extend(rows)
+        except Exception as e:
+            errors.append(str(e))
+
+    social = []
+    try:
+        social = scrape_x()
+    except Exception as e:
+        errors.append(str(e))
+
+    payload["lottery"] = normalize(lottery)
+    payload["social"] = normalize(social)
+    payload["site"]["updatedAt"] = now_text()
+    DATA_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    old = load_state()
+    changed_lottery = diff_items(old.get("lottery", []), payload["lottery"])
+    if changed_lottery:
+        lines = ["【ポケカ速報ラボ 更新検知】"]
+        for item in changed_lottery[:10]:
+            lines.append(f"- {item.get('shop')} / {item.get('product')} / {item.get('status')} / {item.get('url')}")
+        try_send_discord("\n".join(lines))
+
+    save_state({
+        "lottery": payload["lottery"],
+        "commerce": payload.get("commerce", []),
+        "social": payload["social"],
+    })
+
+    if errors:
+        print("completed with errors:")
+        for e in errors:
+            print(" -", e)
+    else:
+        print("completed")
+
+if __name__ == "__main__":
+    main()

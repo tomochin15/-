@@ -1,4 +1,36 @@
-User-agent: *
-Allow: /
+# ポケカ速報ラボ 完全自動寄せ版
 
-Sitemap: https://YOUR-DOMAIN/sitemap.xml
+この版では、開始・締切・結果発表を可能な範囲で自動抽出し、差分検知まで入れています。
+
+## 追加・強化した点
+- `extractors.py`
+  - 開始 / 締切 / 結果発表の日時抽出を共通化
+- `scraper_joshin.py`
+  - Joshinの日時文言抽出を追加
+- `build_data.py`
+  - 差分検知
+  - `.last_state.json` に前回状態を保存
+  - Discord通知に対応
+- `config.example.json`
+  - 通知設定
+- `requirements.txt`
+  - 実行に必要なライブラリ
+
+## 使い方
+1. `pip install -r requirements.txt`
+2. `config.example.json` を `config.json` にコピー
+3. Discord通知を使うなら `discord_webhook` を設定
+4. `social_source.sample.json` を `social_source.json` にコピーし、X情報を投入
+5. `python build_data.py`
+6. `data.json` が更新される
+
+## 自動でできること
+- ポケモンセンターオンライン: 一覧 + 個別候補ページの日時抽出
+- ヨドバシ.com: 抽選トップ + 個別候補ページの日時抽出
+- Joshin: トップ導線 + 日時文言の自動抽出
+- X情報: `social_source.json` を通して統合
+- 差分検知: 変更があればDiscord通知
+
+## 正直な限界
+- 各サイトのHTMLや文言が変わると、抽出ルールの微修正は必要
+- 日時抽出はページ記述の揺れに左右されるため、最終確認は公式ページ前提

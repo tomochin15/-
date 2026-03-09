@@ -1,32 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>再販・予約 | ポケカ速報ラボ</title>
+<meta name="description" content="Amazon招待、楽天、Yahooの再販・予約導線をまとめたページ。" />
+<link rel="stylesheet" href="style.css" />
+<link rel="manifest" href="site.webmanifest" />
 
-from __future__ import annotations
+</head>
+<body>
 
-import re
-from typing import Any, Dict, List
-import requests
-from bs4 import BeautifulSoup
+<nav class="topnav container"><a href="index.html">トップ</a><a href="lotteries.html">抽選一覧</a><a href="guides/index.html">ガイド</a></nav>
+<main class="container page">
+  <section class="card">
+    <p><a href="index.html">← トップへ戻る</a></p>
+    <h1>再販・予約</h1>
+    <p class="notice">Amazonは招待リクエストのみを対象にしています。</p>
+    <div id="commerceFeed" class="feed-list"></div>
+  </section>
+</main>
 
-HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; PokekaMonitor/1.0)"}
-
-def _clean(text: str) -> str:
-    return re.sub(r"\s+", " ", text).strip()
-
-def scrape(url: str = "https://joshinweb.jp/toy/top.html") -> List[Dict[str, Any]]:
-    resp = requests.get(url, headers=HEADERS, timeout=20)
-    resp.raise_for_status()
-    soup = BeautifulSoup(resp.text, "lxml")
-    text = _clean(soup.get_text(" ", strip=True))
-
-    status = "ポケモンカード抽選販売あり" if "ポケモンカード抽選販売" in text else "玩具ページ監視中"
-
-    return [{
-        "shop": "Joshin",
-        "product": "おもちゃトップページ",
-        "status": status,
-        "start": "公式ページ確認",
-        "end": "公式ページ確認",
-        "result": "公式ページ確認",
-        "url": url,
-        "publishedAt": "",
-        "summary": "Joshinおもちゃトップにあるポケモンカード抽選販売導線の有無を簡易判定。"
-    }]
+<script src="app.js"></script>
+</body>
+</html>
